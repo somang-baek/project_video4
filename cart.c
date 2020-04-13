@@ -43,15 +43,13 @@ T_Record* o_search_by_obj(char* o,char* n){
 	for(i=0; i<MAX_OBJ; i++){
 		if(obj[i]!=NULL && strcmp(obj[i]->obj, o)==0){
 #ifdef DEBUG
-			printf("[DEBUG]Find same object(%s)\n", o);
+			printf("[DEBUG]Find same object(%s)\n", obj[i]->obj);
 #endif
-			for(i=0; i<MAX_OBJ; i++){
-				if(obj[i]!=NULL && strcmp(obj[i]->name, n)==0){
+			if(obj[i]!=NULL && strcmp(obj[i]->name, n)==0){
 #ifdef DEBUG
-					printf("[DEBUG]Find same object(%s) & name(%s)\n", o, n);
+				printf("[DEBUG]Find same object(%s) & name(%s)\n", obj[i]->obj, obj[i]->name);
 #endif
-					return obj[i];
-				}
+				return obj[i];
 			}
 		}
 	}
@@ -117,11 +115,36 @@ T_Record* o_search_by_obj2(char* o,char* n, int* b){
 }
 
 void o_update(T_Record* o, int p, int c){
-	
+	o->price = p;
+	o->cnt = c;
+#ifdef DEBUG
+	printf("[DEBUG]Complete updating %s's price(%d) & count(%d)\n", o->name, o->price, o->cnt);
+#endif
 }
 
 void o_delete(T_Record* o){
+	int i, index;
 	
+	for(i=0; i<MAX_OBJ; i++){
+		if(obj[i]==o) {
+			index=i;
+			break;
+		}
+	}
+	free(o);
+	obj[index] = NULL;
+	_count--;
+#ifdef DEBUG
+	printf("[DEBUG]Complete delete obj[%d]=%s\n", index, (char*)obj[index]);
+#endif
+
+	for(i=index; i<MAX_OBJ; i++){
+		obj[i] = obj[i+1];
+		if((i+1)==MAX_OBJ) break;
+	}
+#ifdef DEBUG
+	printf("[DEBUG]Complete Defragmentation.\n");
+#endif
 }
 
 void o_get_all(T_Record* a[]){
@@ -137,12 +160,13 @@ void o_get_all(T_Record* a[]){
 	}
 }
 
-void o_get_all2(T_Record* a[]){
-
-}
-
 char* o_to_string(T_Record* o){
-
+	static char str[80];
+	sprintf(str, "[%s] %s / 수량: %d / %d 원", o->name, o->obj, o->cnt, o->price);
+#ifdef DEBUG
+			printf("[DEBUG]Complete making %s's array to string\n", o->name);
+#endif
+	return str;
 }
 
 char* o_getobj(T_Record* o){
@@ -159,14 +183,6 @@ int o_getcount(T_Record* o){
 
 char* o_getname(T_Record* o){
 	return o->name;
-}
-
-int o_get_all_by_obj(T_Record* a[], char* p){
-
-} 
-
-int o_get_all_by_name(T_Record* a[], char* p){
-
 }
 
 void o_init(){
@@ -190,18 +206,40 @@ char* o_to_string_save(T_Record* o){
 	return str;
 }
 
-void o_to_upload(){
+int o_total_price(T_Record* o, int total){
+	total = (o->price * o->cnt) + total;
 
+#ifdef DEBUG
+	printf("[DEBUG]Complete compute total price: %d\n", total);
+#endif
+
+	return total;
 }
 
-void o_to_save(){
+void o_sort(T_Record* a[], int size){
+	int i=0, j=0;
+	T_Record* o;
 
-}
+	for(i=0;i<size-1;i++){
+		for(j=i+1;j<size;j++){
+			if(strcmp(a[i]->name, a[j]->name)>0){
+#ifdef DEBUG
+				printf("[DEBUG]Before: #%d %s\n", i, a[i]->name);
+#endif
+				o = a[i];
+				a[i] = a[j];
+				a[j] = o;
+#ifdef DEBUG
+				printf("[DEBUG]After: #%d %s\n", i, a[i]->name);
+#endif
+			}
+		}
+	}
 
-int o_total_price(T_Record* o){
-
-}
-
-int o_sort(T_Record* a[]){
-
+	for(i=0;i<size;i++){
+		obj[i] = a[i];
+#ifdef DEBUG
+		printf("[DEBUG]Complete sorted %s\n", obj[i]->name);
+#endif
+	}
 }

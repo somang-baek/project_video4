@@ -81,23 +81,16 @@ void create_record(){
 
 void read_record(){
     char name[20];
-	int i=1, t=0;
-	int* b;
+	int i=1, t=0, b=0;
 
 	printf("Enter a name > ");
     scanf("%s", name);
 	
-	*b = 0;
-	//printf("%d\n", *b);
-	
 	for(i=1;i<=MAX_OBJ;i++){
-		T_Record* p = o_search_by_name(name, b);
+		T_Record* p = o_search_by_name(name, &b);
 		
-		//printf("%d --- %s --- %d\n", i, name, *b);
 		if(p){
-			//printf("%s\n", p->name);
-			if(o_search_by_obj2(p->obj, p->name, b)){
-				//printf("pass\n");
+			if(o_search_by_obj2(p->obj, p->name, &b)){
 				continue;
 			}
 	        printf("#%d Object info.\n", i);
@@ -114,24 +107,104 @@ void read_record(){
 }
 
 void update_record(){
+    char obj[20], name[20];
+    int price, cnt;  
+	
+	printf("Enter a name > ");
+	scanf("%s", name);
+	printf("Enter a object > ");
+	scanf("%s", obj);
 
+	T_Record* p = o_search_by_obj(obj, name);
+	
+	if(p) {
+		printf("Enter a updated info.\n");
+		printf("price > ");
+		scanf("%d", &price);
+		printf("count > ");
+		scanf("%d", &cnt);
+		
+		o_update(p, price, cnt);
+		printf("Complete!\n");
+	}
+	else {
+		printf("No such object & name!\n");
+	}
 }
 
 void delete_record(){
+	char obj[20], name[20];
+	
+	printf("Enter a name > ");
+	scanf("%s", name);
+	printf("Enter a object > ");
+	scanf("%s", obj);
 
+	T_Record* p = o_search_by_obj(obj, name);
+	
+	if(p) {
+			o_delete(p);
+			printf("The record is deleted!\n");
+	}
+	else {
+			printf("No such object & name!\n");
+	}
 }
 
 void list_record(){
     // 전체 리스트 출력
-
+	printf("All records.\n");
+	
+	int size = o_count();
+	T_Record* records[MAX_OBJ];
+	o_get_all(records);
+	
+	for(int i=0; i<size; i++){
+		T_Record* p = records[i];
+		printf("%d. %s\n", i+1, o_to_string(p));
+	}
 }
 
 void total_price(){
+    char name[20];
+	int i=1, t=0, b=0, t_price=0;
 
+	printf("Enter a name > ");
+    scanf("%s", name);
+	
+	for(i=1;i<=MAX_OBJ;i++){
+		T_Record* p = o_search_by_name(name, &b);
+		
+		if(p){
+			if(o_search_by_obj2(p->obj, p->name, &b)){
+				continue;
+			}
+			t_price = o_total_price(p, t_price);
+			t++;
+		}
+	}
+	
+	if(t==0)
+		printf("No such name!\n");
+	else
+		printf("%s's total price >> %d 원\n", name, t_price);	
 }
 
 void sort_record(){
+	int answer;
+	
+	printf("All data is sorted in ascending order of names.\n");
+	printf("1. Yes 0. No > ");
+	scanf("%d", &answer);
 
+	if(answer == 0) return;
+	
+	int size = o_count();
+	
+	T_Record* records[MAX_OBJ];
+	o_get_all(records);
+	o_sort(records, size);
+	printf("Complete!\n");
 }
 
 void import_record(){
