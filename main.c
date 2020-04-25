@@ -82,11 +82,12 @@ void create_record(){
 void read_record(){
     char name[20];
 	int i=1, t=0, b=0;
+	int size = o_count();
 
 	printf("Enter a name > ");
     scanf("%s", name);
 	
-	for(i=1;i<=MAX_OBJ;i++){
+	for(i=1;i<=size;i++){
 		T_Record* p = o_search_by_name(name, &b);
 		
 		if(p){
@@ -167,12 +168,13 @@ void list_record(){
 
 void total_price(){
     char name[20];
-	int i=1, t=0, b=0, t_price=0;
+	int i=0, t=0, b=0, t_price=0;
+	int size = o_count();
 
 	printf("Enter a name > ");
     scanf("%s", name);
 	
-	for(i=1;i<=MAX_OBJ;i++){
+	for(i=0;i<size;i++){
 		T_Record* p = o_search_by_name(name, &b);
 		
 		if(p){
@@ -198,13 +200,19 @@ void sort_record(){
 	scanf("%d", &answer);
 
 	if(answer == 0) return;
-	
-	int size = o_count();
-	
-	T_Record* records[MAX_OBJ];
-	o_get_all(records);
-	o_sort(records, size);
-	printf("Complete!\n");
+	else if(answer == 1){	
+		int size = o_count();
+
+		T_Record* records[MAX_OBJ];
+		o_get_all(records);
+		o_sort(records, size);
+		printf("Complete!\n");
+	}
+	else{
+		printf("Your answer is wrong!\n");
+
+		return;
+	}
 }
 
 void import_record(){
@@ -216,41 +224,98 @@ void import_record(){
 	scanf("%d", &answer);
 
 	if(answer == 0) return;
-	
-	o_init();
-	FILE* f = fopen("cart.txt", "r");
-	char obj[20], name[20];
-	int price, cnt;
-	
-	while(!feof(f)){
-		if(!o_is_available()){
-			printf("[Import] There is no space!\n");
-		}
+	else if(answer == 1){	
+		o_init();
+		FILE* f = fopen("cart.txt", "r");
+		char obj[20], name[20];
+		int price, cnt;
 
-		int n = fscanf(f, "%s %d %d %s", obj, &price, &cnt, name);
-		if(n<4) break;
-		if(o_search_by_obj(obj, name)){
-			printf("[Import] Duplicated object(%s) & name(%s)!\n", obj, name);
-			continue;
+		while(!feof(f)){
+			if(!o_is_available()){
+				printf("[Import] There is no space!\n");
+			}
+
+			int n = fscanf(f, "%s %d %d %s", obj, &price, &cnt, name);
+
+			if(n<4) break;
+			if(o_search_by_obj(obj, name)){
+				printf("[Import] Duplicated object(%s) & name(%s)!\n", obj, name);
+				continue;
+			}
+			o_create(obj, price, cnt, name);
 		}
-		o_create(obj, price, cnt, name);
+		printf("%d records are read from file!\n", o_count());
+		
+		fclose(f);
 	}
-	printf("%d records are read from file!\n", o_count());
-	fclose(f);
+	else{
+		printf("Your answer is wrong!\n");
+
+		return;
+	}
 }
 
 void save_record(){
     // 데이터파일 저장
-	FILE* f = fopen("cart.txt", "w");
-	//printf("All records.\n");
+	int answer;
 
-	int size = o_count();
-	T_Record* records[MAX_OBJ];
-	o_get_all(records);
-	for(int i=0;i<size;i++){
-		T_Record* p = records[i];
-		fprintf(f, "%s\n", o_to_string_save(p));
+	printf("You choose one.\n");
+	printf("1. ranking top5(total price) 2. All records > ");
+	scanf("%d", &answer);
+
+	if(answer == 1){
+		FILE* fd = fopen("ranking.txt", "w");
+		int i=0, j=0, k=0, b=0, t_price=0;
+		int s = o_count();
+		T_Record* r[MAX_OBJ];
+		R_Record* rank[MAX_OBJ];
+	
+		o_get_all(r);
+		for(j=0;j<s;j++){	
+			for(i=0;i<s;i++){
+				T_Record* p = o_search_by_name(r[j]->name, &b);
+				
+				if(p){
+					if(o_search_by_obj2(p->obj, p->name, &b)){
+						continue;
+					}
+					t_price = o_total_price(p, t_price);
+				}
+			}
+			rank[j] = o_ranking(r[j], t_price);
+			t_price = 0;
+			b=0;
+		}
+		
+		o_ranking_list(rank, s);
+
+		for(k=0;k<5;k++){
+			fprintf(fd, "%s\n", o_ranking_string(k));
+		}
+		printf("Complete!\n");
+
+		fclose(fd);
 	}
-	printf("%d records are saved in file!\n", size);
-	fclose(f);
+	else if(answer == 2){
+		FILE* f = fopen("cart.txt", "w");
+
+		int size = o_count();
+		T_Record* records[MAX_OBJ];
+
+		o_get_all(records);
+		
+		for(int i=0;i<size;i++){
+			T_Record* p = records[i];
+			
+			fprintf(f, "%s\n", o_to_string_save(p));
+		}
+		printf("%d records are saved in file!\n", size);
+		
+		fclose(f);
+	}
+	else{
+		printf("Your answer is wrong!\n");
+
+		return;
+	}
 }

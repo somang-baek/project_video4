@@ -1,6 +1,7 @@
 #include "cart.h"
 
 T_Record* obj[MAX_OBJ]; // 회원정보데이터 (전역)
+R_Record* ran[MAX_OBJ]; // 회원정보데이터 (전역)
 int _count = 0;
 
 int o_is_available(){
@@ -40,7 +41,9 @@ void o_create(char* o, int p, int c, char* n){
 
 T_Record* o_search_by_obj(char* o,char* n){
 	int i;
-	for(i=0; i<MAX_OBJ; i++){
+	int size = o_count();
+
+	for(i=0; i<size; i++){
 		if(obj[i]!=NULL && strcmp(obj[i]->obj, o)==0){
 #ifdef DEBUG
 			printf("[DEBUG]Find same object(%s)\n", obj[i]->obj);
@@ -61,8 +64,9 @@ T_Record* o_search_by_obj(char* o,char* n){
 
 T_Record* o_search_by_name(char* n, int* b){
 	int i=0;
+	int size = o_count();
 
-	for(i=*b; i<MAX_OBJ; i++){
+	for(i=*b; i<size; i++){
 		if(obj[i]!=NULL && strcmp(obj[i]->name, n)==0){
 			*b = i;
 #ifdef DEBUG
@@ -242,4 +246,105 @@ void o_sort(T_Record* a[], int size){
 		printf("[DEBUG]Complete sorted %s\n", obj[i]->name);
 #endif
 	}
+}
+
+R_Record* o_ranking(T_Record* o, int total){
+	R_Record* p = (R_Record*)malloc(sizeof(R_Record));
+
+	strcpy(p->name, o->name);
+	p->t_price = total;
+
+#ifdef DEBUG
+	printf("[DEBUG]Complete saving %s in ranking array \n", p->name);
+#endif
+
+	return p;
+}
+
+void ran_malloc(){
+	for(int i=0;i<MAX_OBJ;i++){
+		ran[i] = (R_Record*)malloc(sizeof(R_Record));
+	}
+}
+
+void o_ranking_list(R_Record* rank[], int size){
+	int i=0, j=0, k=0, c=0;
+	R_Record* o[size];
+	for(i=0;i<size;i++){
+		o[i] = (R_Record*)malloc(sizeof(R_Record));
+	}
+
+	for(i=0;i<size;i++){
+		for(j=0;j<i;j++){
+			if(strcmp(rank[i]->name, rank[j]->name)==0){
+				c++;
+#ifdef DEBUG
+				printf("[DEBUG]Complete comparing %s & %s\n", rank[i]->name, rank[j]->name);
+#endif
+			}
+		}
+
+		if(c==0){
+			strcpy(o[k]->name, rank[i]->name);
+			o[k]->t_price = rank[i]->t_price;
+#ifdef DEBUG
+			printf("[DEBUG]Complete copying %s & %s\n", o[k]->name, rank[j]->name);
+#endif
+			k++;
+		}
+		c=0;
+	}
+
+	R_Record* max[k];
+	for(i=0;i<k;i++){
+		max[i] = (R_Record*)malloc(sizeof(R_Record));
+	}
+	R_Record* tmp = (R_Record*)malloc(sizeof(R_Record));
+	
+	for(i=0;i<k;i++){
+		strcpy(max[i]->name, o[i]->name);
+		max[i]->t_price = o[i]->t_price;
+#ifdef DEBUG
+		printf("[DEBUG]Complete copying %s & %s\n", max[i]->name, o[i]->name);
+#endif
+	}
+
+	for(i=0;i<k;i++){
+		for(j=i+1;j<k;j++){
+#ifdef DEBUG
+			printf("[DEBUG]Complete comparing %s:%d vs. %s:%d\n", max[i]->name, max[i]->t_price, max[j]->name, max[j]->t_price);
+#endif
+			if(max[i]->t_price < max[j]->t_price){
+				strcpy(tmp->name, max[i]->name);
+				tmp->t_price = max[i]->t_price;
+				strcpy(max[i]->name, max[j]->name);
+				max[i]->t_price = max[j]->t_price;
+				strcpy(max[j]->name, tmp->name);
+				max[j]->t_price = tmp->t_price;
+#ifdef DEBUG
+				printf("[DEBUG]Complete changing %s:%d\n", max[i]->name, max[i]->t_price);
+#endif
+			}
+		}
+	}
+	
+	ran_malloc();
+	for(i=0;i<k;i++){
+		strcpy(ran[i]->name, max[i]->name);
+		ran[i]->t_price = max[i]->t_price;
+#ifdef DEBUG
+		printf("[DEBUG]Complete copying %s & %s\n", ran[i]->name, max[i]->name);
+#endif
+	}
+}
+
+char* o_ranking_string(int i){
+	static char str[80];
+
+	sprintf(str, "%d등:  %s %d", i+1, ran[i]->name, ran[i]->t_price);
+#ifdef DEBUG
+	printf("[DEBUG](%s) Complete!\n", str);
+#endif
+	return str;
+
 }

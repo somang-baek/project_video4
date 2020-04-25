@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_OBJ 5	// 저장할 수 있는 물건 레코드 최대 갯수
+#define MAX_OBJ 100	// 저장할 수 있는 물건 레코드 최대 갯수
 
 //물건 정보 레코드의 데이터 타입 
 typedef struct st_object{
@@ -11,6 +11,11 @@ typedef struct st_object{
 	int cnt; 		// 물건 수량
 	char name[20]; 	// 주문자 이름
 }T_Record;
+
+typedef struct ranking{
+	char name[20]; 	// 주문자 이름
+	int t_price;	// 총 주문 가격
+}R_Record;
 
 //라이브러리 함수 원형을 선언
 int o_is_available();		// 데이터 공간 유무
@@ -32,3 +37,6 @@ void o_init();	// 모든 레코드 제거
 char* o_to_string_save(T_Record* o);	//레코드의 내용을 파일 저장용 문자열로 가져오기
 int o_total_price(T_Record* o, int total);	// 특정 물건 레코드의 총 가격
 void o_sort(T_Record* a[], int size);	// 가나다 순으로 정렬된 레코드 포인터 배열 만들기
+R_Record* o_ranking(T_Record* o, int total);
+void o_ranking_list(R_Record* rank[], int size);
+char* o_ranking_string(int i);
