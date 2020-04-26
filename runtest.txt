@@ -3,7 +3,7 @@ Menu : 1.Create 2.Read 3.Update 4.Delete 5.List 6.total_price 7.sort 8.import 9.
 Enter a new object's info.
 Object > 김
 Price(원) > 1000
-Count > 5
+Count > 3
 Name > 백소망
 Complete!
 
@@ -13,7 +13,7 @@ Enter a name > 백소망
 Enter a object > 김
 Enter a updated info.
 price > 1500
-count > 3
+count > 2
 Complete!
 
 Menu : 1.Create 2.Read 3.Update 4.Delete 5.List 6.total_price 7.sort 8.import 9.Save 0.Quit > 2
@@ -22,6 +22,5 @@ Enter a name > 백소망
 #1 Object info.
 Object : 김
 Price : 1500
-Count : 3
+Count : 2
 Name : 백소망
-
