@@ -3,7 +3,7 @@ Menu : 1.Create 2.Read 3.Update 4.Delete 5.List 6.total_price 7.sort 8.import 9.
 Enter a new object's info.
 Object > 김
 Price(원) > 1000
-Count > 3
+Count > 5
 Name > 백소망
 Complete!
 
